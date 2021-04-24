@@ -53,6 +53,15 @@ def test(model=None, use_ckpt=False):
     print(classification_report([i[1] for i in data.test_data], [data.labels[i] for i in pred]))
 
 
+def export(model=None, use_ckpt=False, save='model.pt'):
+    if use_ckpt:
+        print(model)
+        model = ResNetRunner.load_from_checkpoint(model)
+    
+    script = model.to_torchscript(save, method='trace')
+    return script
+
+
 if __name__ == '__main__':
     pl.seed_everything(17)
 
@@ -63,3 +72,6 @@ if __name__ == '__main__':
     test(model='versions/swa/checkpoints/last.ckpt', use_ckpt=True)
     test(model='versions/swa/checkpoints/epoch=99-step=1899.ckpt', use_ckpt=True)
     test(model='versions/checkpoints/epoch=59-step=1139.ckpt', use_ckpt=True)
+
+    export(model='versions/swa/checkpoints/epoch=99-step=1899.ckpt', use_ckpt=True, save='swa99.pt')
+    # model = torch.jit.load('model.pt')
